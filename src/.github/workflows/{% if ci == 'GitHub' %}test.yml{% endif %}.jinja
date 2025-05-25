@@ -126,7 +126,7 @@ jobs:
         {%- if odoo_version < 16 %}
         image: postgres:9.6
         {%- else %}
-        image: postgres:12.0
+        image: postgres:14.0
         {%- endif %}
         env:
           POSTGRES_USER: odoo
@@ -146,6 +146,8 @@ jobs:
           persist-credentials: false
       - name: Install addons and dependencies
         run: oca_install_addons
+        env:
+          GIT_TOKEN: {{ "${{" }} secrets.GIT_TOKEN {{ "}}" }}
       - name: Check licenses
         run: manifestoo -d . check-licenses
         {%- if not github_check_license %}
@@ -164,6 +166,7 @@ jobs:
       - uses: codecov/codecov-action@v4
         with:
           token: {{"${{ secrets.CODECOV_TOKEN }}"}}
+          fail_ci_if_error: true # optional (default = false)
       {%- endif %}
       {% raw -%}
       - name: Update .pot files
